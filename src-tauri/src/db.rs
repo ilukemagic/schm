@@ -37,6 +37,13 @@ impl Database {
     // 保存剪贴板事件
     pub fn save_event(&self, event: &ClipboardEvent) -> Result<(), rusqlite::Error> {
         let tags_json = serde_json::to_string(&event.tags).unwrap_or_default();
+        // 计算毫秒级时间戳
+        let time_ms = event
+            .create_time
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_millis() as u64; // 转换为毫秒级并存储为 u64
+
         self.conn.lock().unwrap().execute(
             "INSERT INTO clipboard_history (id, content, content_type, create_time, tags)
              VALUES (?1, ?2, ?3, ?4, ?5)",
@@ -44,11 +51,7 @@ impl Database {
                 event.id.to_string(),
                 event.content,
                 format!("{:?}", event.content_type),
-                event
-                    .create_time
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .unwrap()
-                    .as_secs(),
+                time_ms.to_string(), // 存储毫秒级时间戳
                 tags_json,
             ],
         )?;
