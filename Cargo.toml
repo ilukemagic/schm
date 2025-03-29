@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 # 异步运行时
-tokio = "1.44.1"
+tokio = { version = "1", features = ["full"] }
 # 剪贴板操作
 clipboard = "0.5"
 # 序列化/反序列化

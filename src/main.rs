@@ -1,9 +1,7 @@
 use arboard::Clipboard;
 use serde::{Deserialize, Serialize};
-use std::{
-    sync::mpsc,
-    time::{Duration, SystemTime},
-};
+use std::time::{Duration, SystemTime};
+use tokio::sync::mpsc;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct ClipboardEvent {
@@ -73,7 +71,7 @@ impl ClipboardWatcher {
                     let content_type = ClipboardEvent::detect_content_type(&content);
                     let event = ClipboardEvent::new(content.clone(), content_type);
 
-                    if let Err(e) = self.tx.send(event) {
+                    if let Err(e) = self.tx.send(event).await {
                         eprintln!("Failed to send clipboard event: {}", e);
                     }
                     self.last_content = content;
@@ -85,6 +83,25 @@ impl ClipboardWatcher {
     }
 }
 
-fn main() {
-    println!("Hello, world!");
+#[tokio::main]
+async fn main() {
+    // 创建通道用于传递剪贴板事件
+    // 使用 mpsc::channel 创建一个通道
+    let (tx, mut rx) = mpsc::channel::<ClipboardEvent>(100);
+
+    // 在单独的任务中运行剪贴板监听器
+    // 使用 tx.clone() 创建一个独立的通道副本
+    let watcher_tx = tx.clone();
+    // 使用 tokio::spawn 创建一个新任务
+    tokio::spawn(async move {
+        let mut watcher =
+            ClipboardWatcher::new(watcher_tx).expect("Failed to create clipboard watcher");
+        watcher.watch().await;
+    });
+
+    // 在主任务中处理剪贴板事件
+    // 使用 rx.recv() 接收剪贴板事件
+    while let Some(event) = rx.recv().await {
+        println!("New clipboard content: {:?}", event);
+    }
 }
