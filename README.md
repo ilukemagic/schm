@@ -1,119 +1,153 @@
-# Smart Clipboard History Manager (智能剪贴板历史管理器)
+# SCHM: Smart Clipboard History Manager
 
-### 项目概述
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)
+![Status](https://img.shields.io/badge/status-in%20development-orange)
 
-智能剪贴板历史管理器是一个使用 Tauri (Rust) 和 React 构建的现代桌面应用，通过 AI 功能智能管理和组织剪贴板内容。
+SCHM is a modern desktop application built with Tauri (Rust) and React that intelligently manages and organizes clipboard content with AI-powered features.
 
-### 核心功能
+## Overview
 
-#### 1. 剪贴板管理
+SCHM enhances your productivity by automatically capturing, categorizing, and managing clipboard contents. It provides quick access to your clipboard history through an intuitive interface and smart search capabilities.
 
-- 实时剪贴板监控和内容捕获
-- 支持多种内容类型：
-  - 文本
-  - 图片
-  - URL 链接
-  - 代码片段
-- 可自定义历史记录保留时间
-- 快速搜索和筛选功能
+## Features
 
-#### 2. 智能组织
+### Core Functionality
 
-- AI 驱动的内容分类
-- 自动内容标签
-- 常用内容优先级排序
-- 智能文件夹和收藏
-- 自定义分类规则
+- **Real-time Clipboard Monitoring**: Automatically captures and stores clipboard content
+- **Multi-format Support**: Handles text, URLs, code snippets, and images
+- **Intelligent Content Classification**: Automatically detects and categorizes content types
+- **Customizable Retention**: Configure how long clipboard history is preserved
 
-#### 3. 安全与隐私
+### User Experience
 
-- 敏感信息检测（信用卡、密码等）
-- 可选内容加密
-- 注重隐私的设计
-- 可配置内容排除规则
-- 安全数据存储
+- **Global Shortcuts**: Access your clipboard history from anywhere with customizable shortcuts (default: `Ctrl+Shift+V` / `Cmd+Shift+V`)
+- **Quick Search**: Rapidly find past clipboard items with powerful search capabilities
+- **Compact & Full Modes**: Choose between a minimal interface for quick access or a comprehensive view for detailed management
+- **System Tray Integration**: Always accessible while staying out of your way
+- **Dark/Light Themes**: Adapt to your preferred visual style
 
-#### 4. 用户界面
+### Security & Privacy
 
-- 现代直观的设计
-- 深色/浅色主题支持
-- 可自定义快捷键
-- 系统托盘快速访问
-- 流畅的动画效果
+- **Local Storage**: All clipboard data remains on your device
+- **No Cloud Synchronization**: Your data never leaves your computer
+- **Minimal Permissions**: Only accesses what's necessary to function
 
-#### 5. 高级功能
+## Usage Guide
 
-- 跨设备同步（可选）
-- 内容分析和洞察
-- 导出/导入功能
-- 备份和恢复选项
-- 插件系统扩展性
+SCHM integrates into your workflow with intuitive controls and keyboard shortcuts.
 
-### 开发阶段
+### Global Shortcuts
 
-#### 第一阶段：核心基础
+| Shortcut                                                | Action                      |
+| ------------------------------------------------------- | --------------------------- |
+| `Ctrl+Shift+V` (Windows/Linux)<br>`Cmd+Shift+V` (macOS) | Open SCHM clipboard manager |
+| `Esc`                                                   | Close SCHM window           |
 
-- 基础剪贴板监控
-- 简单存储系统
-- 基本 UI 组件
-- 内容类型检测
+### Navigation
 
-#### 第二阶段：智能功能
+When the clipboard manager is open:
 
-- 基础内容分类
-- 搜索功能
-- UI 优化
-- 设置管理
+| Shortcut         | Action                                           |
+| ---------------- | ------------------------------------------------ |
+| `↑` (Up Arrow)   | Navigate to previous clipboard item              |
+| `↓` (Down Arrow) | Navigate to next clipboard item                  |
+| `Enter`          | Copy selected item to clipboard and close window |
+| `Click` on item  | Copy item to clipboard and close window          |
 
-#### 第三阶段：高级功能
+### Interface Modes
 
-- AI 集成
-- 分析功能实现
-- 跨设备同步
-- 安全功能
+#### Compact Mode
 
-### 项目进度规划
+- Triggered by the global shortcut
+- Streamlined interface for quick copy operations
+- Features search bar and content tabs
+- Shows keyboard shortcut hints at the bottom
 
-#### 里程碑 1（2-3 周）
+#### Main Mode
 
-- [x] 项目初始化设置
-- [ ] 基础剪贴板监听实现
-- [ ] 基本 UI 界面搭建
-- [ ] 本地存储实现
+- Full application window with comprehensive features
+- Access through system tray icon
+- Provides detailed view of clipboard items
+- Includes advanced filtering and management options
 
-#### 里程碑 2（3-4 周）
+### Content Filtering
 
-- [ ] 内容分类系统
-- [ ] 搜索功能
-- [ ] 用户设置界面
-- [ ] 基础数据分析
+SCHM automatically categorizes your clipboard content into:
 
-#### 里程碑 3（4-5 周）
+- **Text**: Regular text snippets
+- **Link**: URLs and web links
+- **Code**: Programming code and syntax
 
-- [ ] AI 功能集成
-- [ ] 高级特性实现
-- [ ] 性能优化
-- [ ] 跨平台测试
+Use the tabs at the top of the interface to filter by content type, or use the search bar to find specific items by keyword.
 
-### 技术栈选择
+### System Tray
 
-#### 前端技术
+The application runs in the background with a system tray icon that provides quick access to:
 
-- React 18
-- TypeScript 5.0+
-- Chakra UI/Material UI
-- Zustand (状态管理)
+- Show main window
+- Hide to tray
+- Quit application
 
-#### 后端技术
+## Technical Architecture
 
-- Rust 1.75+
-- Tauri 2.0
-- SQLite
-- Tokio (异步运行时)
+### Frontend
 
-#### 开发工具
+- React 18 with TypeScript
+- TailwindCSS for styling
+- Zustand for state management
 
-- VS Code
-- Rust Analyzer
-- Git
-- Docker (可选)
+### Backend
+
+- Rust with Tauri framework
+- SQLite for local storage
+- Tokio for asynchronous runtime
+
+## Development Status
+
+SCHM is currently in active development. The core clipboard monitoring and storage functionality are operational, with AI capabilities and additional features planned for future releases.
+
+### Current Progress
+
+- [x] Core clipboard monitoring engine
+- [x] Basic UI with dark/light theme support
+- [x] Content type detection & classification
+- [x] System tray integration
+- [x] Local SQLite database storage
+- [x] Global shortcut support
+- [ ] AI-powered content analysis
+- [ ] Advanced search capabilities
+- [ ] Cross-device synchronization (optional)
+
+## Building & Running
+
+### Prerequisites
+
+- Node.js (v16+)
+- Rust (1.65+)
+- npm or yarn
+
+### Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/schm.git
+cd schm
+
+# Install dependencies
+npm install
+
+# Run in development mode
+npm run tauri dev
+
+# Build for production
+npm run tauri build
+```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contributing
+
+Contributions are welcome! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute to this project.
