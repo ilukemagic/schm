@@ -1,7 +1,13 @@
+mod db;
+mod ui;
+
 use arboard::Clipboard;
+use db::Database;
 use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
 use std::time::{Duration, SystemTime};
 use tokio::sync::mpsc;
+use ui::{create_system_tray, get_clipboard_history, handle_system_tray_event};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct ClipboardEvent {
@@ -13,7 +19,7 @@ struct ClipboardEvent {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-enum ContentType {
+pub enum ContentType {
     Text,
     Url,
     Code,
@@ -85,23 +91,43 @@ impl ClipboardWatcher {
 
 #[tokio::main]
 async fn main() {
+    let db_path = PathBuf::from("clipboard_history.db");
+    let db = Database::new(&db_path).unwrap();
+
     // 创建通道用于传递剪贴板事件
-    // 使用 mpsc::channel 创建一个通道
     let (tx, mut rx) = mpsc::channel::<ClipboardEvent>(100);
 
-    // 在单独的任务中运行剪贴板监听器
-    // 使用 tx.clone() 创建一个独立的通道副本
-    let watcher_tx = tx.clone();
-    // 使用 tokio::spawn 创建一个新任务
+    // 将数据库克隆一份用于在保存线程中使用
+    let db_clone = db.clone();
+
+    // 启动剪贴板监听器
     tokio::spawn(async move {
-        let mut watcher =
-            ClipboardWatcher::new(watcher_tx).expect("Failed to create clipboard watcher");
+        let mut watcher = match ClipboardWatcher::new(tx) {
+            Ok(w) => w,
+            Err(e) => {
+                eprintln!("无法创建剪贴板监听器: {}", e);
+                return;
+            }
+        };
         watcher.watch().await;
     });
 
-    // 在主任务中处理剪贴板事件
-    // 使用 rx.recv() 接收剪贴板事件
-    while let Some(event) = rx.recv().await {
-        println!("New clipboard content: {:?}", event);
-    }
+    // 处理剪贴板事件并保存到数据库
+    tokio::spawn(async move {
+        while let Some(event) = rx.recv().await {
+            println!("收到新的剪贴板内容: {:?}", event.content_type);
+            if let Err(e) = db_clone.save_event(&event) {
+                eprintln!("保存剪贴板事件失败: {}", e);
+            }
+        }
+    });
+
+    // 创建 Tauri 应用
+    tauri::Builder::default()
+        .manage(db.clone()) // 注入数据库状态
+        .system_tray(create_system_tray())
+        .on_system_tray_event(handle_system_tray_event)
+        .invoke_handler(tauri::generate_handler![get_clipboard_history])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
 }
