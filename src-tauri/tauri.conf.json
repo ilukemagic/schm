@@ -7,7 +7,7 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "demo",
+    "productName": "SCHM",
     "version": "0.1.0"
   },
   "tauri": {
@@ -34,7 +34,7 @@
         "transparent": true,
         "fullscreen": false,
         "resizable": true,
-        "title": "剪贴板管理器",
+        "title": "SCHM",
         "width": 1000,
         "height": 800
       }
@@ -45,7 +45,7 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "com.demo.app",
+      "identifier": "com.schm.app",
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
