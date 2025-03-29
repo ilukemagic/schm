@@ -3,7 +3,7 @@ use rusqlite::{params, Connection};
 use std::path::Path;
 use std::sync::{Arc, Mutex};
 
-// 使用 Arc 来共享连接
+// Use Arc to share connection
 #[derive(Clone)]
 pub struct Database {
     conn: Arc<Mutex<Connection>>,
@@ -19,7 +19,7 @@ impl Database {
         Ok(db)
     }
 
-    // 初始化数据库
+    // Initialize database
     fn init(&self) -> Result<(), rusqlite::Error> {
         self.conn.lock().unwrap().execute(
             "CREATE TABLE IF NOT EXISTS clipboard_history (
@@ -34,15 +34,15 @@ impl Database {
         Ok(())
     }
 
-    // 保存剪贴板事件
+    // Save clipboard event
     pub fn save_event(&self, event: &ClipboardEvent) -> Result<(), rusqlite::Error> {
         let tags_json = serde_json::to_string(&event.tags).unwrap_or_default();
-        // 计算毫秒级时间戳
+        // Calculate milliseconds timestamp
         let time_ms = event
             .create_time
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
-            .as_millis() as u64; // 转换为毫秒级并存储为 u64
+            .as_millis() as u64; // Convert to milliseconds and store as u64
 
         self.conn.lock().unwrap().execute(
             "INSERT INTO clipboard_history (id, content, content_type, create_time, tags)
@@ -51,14 +51,14 @@ impl Database {
                 event.id.to_string(),
                 event.content,
                 format!("{:?}", event.content_type),
-                time_ms.to_string(), // 存储毫秒级时间戳
+                time_ms.to_string(), // Store milliseconds timestamp
                 tags_json,
             ],
         )?;
         Ok(())
     }
 
-    // 获取剪贴板历史记录
+    // Get clipboard history
     pub fn get_history(&self, limit: i32) -> Result<Vec<serde_json::Value>, rusqlite::Error> {
         let conn = self.conn.lock().unwrap();
         let mut stmt = conn.prepare(
@@ -72,15 +72,15 @@ impl Database {
             let id_str: String = row.get(0)?;
             let content: String = row.get(1)?;
             let content_type: String = row.get(2)?;
-            let create_time_str: String = row.get(3)?; // 作为字符串获取
+            let create_time_str: String = row.get(3)?; // Get as string
             let tags_json: String = row.get(4)?;
 
-            // 使用 serde_json::Value 来构建兼容前端的JSON结构
+            // Use serde_json::Value to build a compatible JSON structure for frontend
             let json = serde_json::json!({
                 "id": id_str,
                 "content": content,
                 "content_type": content_type,
-                "create_time": create_time_str,  // 直接使用字符串
+                "create_time": create_time_str,  // Use string directly
                 "tags": serde_json::from_str::<Vec<String>>(&tags_json).unwrap_or_default()
             });
 

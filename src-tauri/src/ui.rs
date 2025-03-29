@@ -4,10 +4,10 @@ use tauri::{
 };
 
 pub fn create_system_tray() -> SystemTray {
-    // 创建系统托盘菜单
-    let show = CustomMenuItem::new("show".to_string(), "显示主窗口");
-    let hide = CustomMenuItem::new("hide".to_string(), "隐藏到托盘");
-    let quit = CustomMenuItem::new("quit".to_string(), "退出");
+    // Create system tray menu
+    let show = CustomMenuItem::new("show".to_string(), "Show main window");
+    let hide = CustomMenuItem::new("hide".to_string(), "Hide to tray");
+    let quit = CustomMenuItem::new("quit".to_string(), "Quit");
 
     let tray_menu = SystemTrayMenu::new()
         .add_item(show)
@@ -15,7 +15,7 @@ pub fn create_system_tray() -> SystemTray {
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(quit);
 
-    // 简单使用系统托盘，不直接指定图标（使用配置文件中的图标）
+    // Simple system tray, no icon specified (use icon from config file)
     SystemTray::new().with_menu(tray_menu)
 }
 
@@ -39,7 +39,7 @@ pub fn handle_system_tray_event(app: &tauri::AppHandle, event: SystemTrayEvent) 
     }
 }
 
-// Tauri 命令，用于获取剪贴板历史
+// Tauri command, for getting clipboard history
 #[tauri::command]
 pub async fn get_clipboard_history(
     db: tauri::State<'_, Database>,

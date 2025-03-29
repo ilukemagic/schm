@@ -45,7 +45,7 @@ export function ClipboardItem({
               onCopy(item.content);
             }}
           >
-            复制
+            Copy
           </Button>
         </div>
       </CardContent>

@@ -39,7 +39,7 @@ impl ClipboardEvent {
         }
     }
 
-    // 检测内容类型的辅助方法
+    // Detect content type helper method
     fn detect_content_type(content: &str) -> ContentType {
         if content.starts_with("http://") || content.starts_with("https://") {
             ContentType::Url
@@ -94,13 +94,13 @@ async fn main() {
     let db_path = PathBuf::from("clipboard_history.db");
     let db = Database::new(&db_path).unwrap();
 
-    // 创建通道用于传递剪贴板事件
+    // Create a channel for passing clipboard events
     let (tx, mut rx) = mpsc::channel::<ClipboardEvent>(100);
 
-    // 将数据库克隆一份用于在保存线程中使用
+    // Clone the database for use in the saving thread
     let db_clone = db.clone();
 
-    // 启动剪贴板监听器
+    // Start clipboard listener
     tokio::spawn(async move {
         let mut watcher = match ClipboardWatcher::new(tx) {
             Ok(w) => w,
@@ -112,7 +112,7 @@ async fn main() {
         watcher.watch().await;
     });
 
-    // 处理剪贴板事件并保存到数据库
+    // Process clipboard events and save to database
     tokio::spawn(async move {
         while let Some(event) = rx.recv().await {
             println!("收到新的剪贴板内容: {:?}", event.content_type);
@@ -122,9 +122,9 @@ async fn main() {
         }
     });
 
-    // 创建 Tauri 应用
+    // Create Tauri application
     tauri::Builder::default()
-        .manage(db.clone()) // 注入数据库状态
+        .manage(db.clone()) // Inject database state
         .system_tray(create_system_tray())
         .on_system_tray_event(handle_system_tray_event)
         .invoke_handler(tauri::generate_handler![get_clipboard_history])

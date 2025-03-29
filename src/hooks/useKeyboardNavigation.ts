@@ -25,7 +25,12 @@ export function useKeyboardNavigation(
           setFocusedItemIndex(newIndex);
 
           const element = document.querySelector(`[data-index="${newIndex}"]`);
-          element?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+          const container = document.querySelector('.compact-list');
+          if (element && container) {
+            element.scrollIntoView({
+              block: 'nearest'
+            });
+          }
         }
       }
 
@@ -45,6 +50,14 @@ export function useKeyboardNavigation(
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isCompactMode, filteredHistory, focusedItemIndex, onCopy, onHide]);
+
+  useEffect(() => {
+    if (isCompactMode && filteredHistory.length > 0) {
+      setFocusedItemIndex(0);
+    } else {
+      setFocusedItemIndex(-1);
+    }
+  }, [isCompactMode, filteredHistory]);
 
   return { focusedItemIndex, setFocusedItemIndex };
 } 

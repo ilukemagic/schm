@@ -16,10 +16,11 @@ export function useWindowManager() {
     await appWindow.setSize(new PhysicalSize(1000, 800));
     await appWindow.center();
     await appWindow.setDecorations(false);
+    await appWindow.setAlwaysOnTop(true);
     await appWindow.show();
     await appWindow.setFocus();
 
-    // 自动聚焦搜索框
+    // Automatically focus the search input
     setTimeout(() => {
       const searchInput = document.querySelector('input[type="text"]');
       if (searchInput) {

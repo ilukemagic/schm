@@ -11,7 +11,7 @@ export function SearchBar({ value, onChange, isCompact }: SearchBarProps) {
     <div className="relative">
       <Input
         type="text"
-        placeholder={isCompact ? "搜索剪贴板内容..." : "搜索..."}
+        placeholder={isCompact ? "Search clipboard content..." : "Search..."}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={isCompact ? "compact-search" : "pl-9"}

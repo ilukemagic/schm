@@ -1,25 +1,17 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { register, unregister } from "@tauri-apps/api/globalShortcut";
-// 导入小窗模式CSS
+// Import compact mode CSS
 import "./compact-mode.css";
-// 导入 sonner
+// Import sonner
 import { Toaster, toast } from "sonner";
 
-// 添加主题切换按钮图标
+// Add theme toggle button icon
 import { CompactMode } from "@/components/CompactMode";
 import { MainMode } from "@/components/MainMode";
 import { useClipboardHistory } from "@/hooks/useClipboardHistory";
 import { useFilteredHistory } from "@/hooks/useFilteredHistory";
 import { useWindowManager } from "@/hooks/useWindowManager";
-
-interface ClipboardEvent {
-  id: string;
-  content: string;
-  content_type: "Text" | "Url" | "Code";
-  create_time: string;
-  tags: string[];
-}
 
 function App() {
   const { history } = useClipboardHistory();
@@ -31,108 +23,62 @@ function App() {
     filteredHistory,
   } = useFilteredHistory(history);
 
-  const { isCompactMode, showWindow, hideWindow, toggleAppWindow } =
-    useWindowManager();
+  const { isCompactMode, hideWindow, toggleAppWindow } = useWindowManager();
 
-  // 主题管理
+  // Theme management
   const { theme, setTheme, resolvedTheme } = useTheme();
 
-  // 强制按钮重新渲染的状态
+  // Force button re-render state
   const [mounted, setMounted] = useState(false);
 
-  const [selectedItem, setSelectedItem] = useState<ClipboardEvent | null>(null);
-
-  // 侧边栏宽度状态
-  const [sidebarWidth, setSidebarWidth] = useState(320);
-  const [isResizing, setIsResizing] = useState(false);
-  const sidebarRef = useRef<HTMLDivElement>(null);
-
-  // 在其他 state 定义附近添加
+  // Add near other state definitions
   const [focusedItemIndex, setFocusedItemIndex] = useState(-1);
 
-  // 确保组件挂载后才渲染主题相关元素
+  // Ensure theme-related elements are rendered only after component mount
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // 切换主题
+  // Toggle theme
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
   };
 
-  // 拖拽相关处理函数
-  const startResizing = (mouseDownEvent: React.MouseEvent) => {
-    mouseDownEvent.preventDefault();
-    setIsResizing(true);
-  };
-
-  // 处理鼠标移动
-  useEffect(() => {
-    const handleMouseMove = (mouseMoveEvent: MouseEvent) => {
-      if (!isResizing) return;
-
-      // 计算新宽度 (最小宽度 240px，最大宽度 500px)
-      const newWidth = Math.max(240, Math.min(500, mouseMoveEvent.clientX));
-      setSidebarWidth(newWidth);
-    };
-
-    const handleMouseUp = () => {
-      setIsResizing(false);
-    };
-
-    // 添加事件监听
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-
-    // 清理函数
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isResizing]);
-
-  // 复制到剪贴板
+  // Copy to clipboard
   const copyToClipboard = (content: string) => {
     navigator.clipboard.writeText(content);
-    // 使用 sonner 的 toast
-    toast.success("已复制到剪贴板", {
-      description: "内容已成功复制到您的剪贴板",
+    // Use sonner toast
+    toast.success("Copied to clipboard", {
+      description: "Content has been successfully copied to your clipboard",
       duration: 2000,
     });
   };
 
-  // 格式化时间
-  const formatTime = (timeStr: string) => {
-    const date = new Date(parseInt(timeStr));
-    return date.toLocaleString();
-  };
-
-  // 注册全局快捷键
   useEffect(() => {
     const registerShortcuts = async () => {
-      // 注册 Ctrl+Shift+V (Windows/Linux) 或 Command+Shift+V (macOS) 为呼出快捷键
+      // Register Ctrl+Shift+V (Windows/Linux) or Command+Shift+V (macOS) as trigger shortcut
       await register("CommandOrControl+Shift+V", () => {
         toggleAppWindow();
       });
 
-      // 添加 Escape 键关闭小窗功能
+      // Add Escape key functionality to close compact mode
       document.addEventListener("keydown", handleKeyDown);
     };
 
     registerShortcuts().catch(console.error);
 
     return () => {
-      // 清理快捷键
+      // Clean up shortcuts
       unregister("CommandOrControl+Shift+V").catch(console.error);
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
 
-  // 修改 handleKeyDown 函数
+  // Modify handleKeyDown function
   const handleKeyDown = (event: KeyboardEvent) => {
     if (!isCompactMode) return;
 
-    // 上下键导航
+    // Arrow key navigation
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
       if (filteredHistory.length > 0) {
@@ -150,18 +96,18 @@ function App() {
         }
         setFocusedItemIndex(newIndex);
 
-        // 确保选中项可见
+        // Ensure selected item is visible
         const element = document.querySelector(`[data-index="${newIndex}"]`);
         element?.scrollIntoView({ block: "nearest", behavior: "smooth" });
       }
     }
 
-    // Escape 键关闭小窗
+    // Escape key closes compact mode
     if (event.key === "Escape") {
       hideWindow();
     }
 
-    // Enter 键复制当前选中项
+    // Enter key copies the currently selected item
     if (event.key === "Enter" && focusedItemIndex !== -1) {
       const selectedItem = filteredHistory[focusedItemIndex];
       if (selectedItem) {
@@ -171,11 +117,11 @@ function App() {
     }
   };
 
-  // 修改键盘事件监听的 useEffect
+  // Modify keyboard event listener useEffect
   useEffect(() => {
     if (isCompactMode) {
       window.addEventListener("keydown", handleKeyDown);
-      // 打开小窗时默认选中第一项
+      // Default selected item when opening compact mode
       if (filteredHistory.length > 0) {
         setFocusedItemIndex(0);
       }
@@ -184,20 +130,25 @@ function App() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isCompactMode, filteredHistory, focusedItemIndex]); // 添加必要的依赖项
+  }, [isCompactMode, filteredHistory, focusedItemIndex]); // Add necessary dependencies
 
-  // 在搜索和标签切换时重置选中项
+  // Modify this useEffect to set selected item only on initialization and search/tab changes
   useEffect(() => {
-    if (isCompactMode && filteredHistory.length > 0) {
+    // Only set selected item on initial opening or search/tab changes
+    if (
+      isCompactMode &&
+      filteredHistory.length > 0 &&
+      focusedItemIndex === -1
+    ) {
       setFocusedItemIndex(0);
-    } else {
+    } else if (!isCompactMode) {
       setFocusedItemIndex(-1);
     }
-  }, [searchTerm, activeTab, filteredHistory.length, isCompactMode]);
+  }, [searchTerm, activeTab, isCompactMode, filteredHistory.length]);
 
-  // 确保在客户端渲染时应用正确的颜色方案
+  // Ensure correct color scheme is applied during client-side rendering
   if (!mounted) {
-    // 返回一个基础占位符状态，避免闪烁
+    // Return a basic placeholder state to avoid flashing
     return <div className="flex h-screen overflow-hidden bg-background"></div>;
   }
 

@@ -37,13 +37,13 @@ export function MainMode({
 }: MainModeProps) {
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [selectedItem, setSelectedItem] = useState<ClipboardEvent | null>(null);
-  const [sidebarWidth, setSidebarWidth] = useState(320);
+  const [sidebarWidth, setSidebarWidth] = useState(500);
   const [isResizing, setIsResizing] = useState(false);
 
   const copyToClipboard = (content: string) => {
     navigator.clipboard.writeText(content);
-    toast.success("已复制到剪贴板", {
-      description: "内容已成功复制到您的剪贴板",
+    toast.success("Copied to clipboard", {
+      description: "Content has been successfully copied to your clipboard",
       duration: 2000,
     });
   };
@@ -88,13 +88,13 @@ export function MainMode({
         <div className="flex items-center justify-between p-6 border-b">
           <div className="flex items-center">
             <span className="text-2xl mr-3">📋</span>
-            <h1 className="text-xl font-semibold">智能剪贴板</h1>
+            <h1 className="text-xl font-semibold">Smart Clipboard</h1>
           </div>
           <Button
             variant="ghost"
             size="icon"
             onClick={onThemeToggle}
-            aria-label="切换主题"
+            aria-label="Toggle theme"
             className="ml-2"
           >
             {theme === "dark" ? (
@@ -109,7 +109,7 @@ export function MainMode({
           <div className="relative">
             <Input
               type="text"
-              placeholder="搜索..."
+              placeholder="Search..."
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
               className="pl-9"
@@ -128,10 +128,10 @@ export function MainMode({
             className="w-full"
           >
             <TabsList className="grid grid-cols-4 w-full">
-              <TabsTrigger value="All">全部</TabsTrigger>
-              <TabsTrigger value="Text">文本</TabsTrigger>
-              <TabsTrigger value="Url">链接</TabsTrigger>
-              <TabsTrigger value="Code">代码</TabsTrigger>
+              <TabsTrigger value="All">All</TabsTrigger>
+              <TabsTrigger value="Text">Text</TabsTrigger>
+              <TabsTrigger value="Url">Link</TabsTrigger>
+              <TabsTrigger value="Code">Code</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -152,7 +152,7 @@ export function MainMode({
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                   <span className="text-4xl mb-4">🔍</span>
-                  <p>未找到匹配的剪贴板记录</p>
+                  <p>No matching clipboard records found</p>
                 </div>
               )}
             </div>
@@ -180,16 +180,16 @@ export function MainMode({
                 }
               >
                 {selectedItem.content_type === "Text"
-                  ? "文本"
+                  ? "Text"
                   : selectedItem.content_type === "Url"
-                  ? "链接"
-                  : "代码"}
+                  ? "Link"
+                  : "Code"}
               </Badge>
               <span className="text-sm text-muted-foreground">
                 {formatTime(selectedItem.create_time)}
               </span>
               <Button onClick={() => copyToClipboard(selectedItem.content)}>
-                复制
+                Copy
               </Button>
             </CardHeader>
             <Separator />
@@ -229,9 +229,11 @@ export function MainMode({
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <div className="text-6xl mb-6 opacity-70">📋</div>
-            <h2 className="text-2xl font-semibold mb-3">智能剪贴板历史</h2>
+            <h2 className="text-2xl font-semibold mb-3">
+              Smart Clipboard History
+            </h2>
             <p className="text-muted-foreground">
-              从左侧选择一个剪贴板项目查看详细内容
+              Select a clipboard item from the left to view details
             </p>
           </div>
         )}

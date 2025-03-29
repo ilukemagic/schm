@@ -31,8 +31,8 @@ export function CompactMode({
 }: CompactModeProps) {
   const copyToClipboard = (content: string) => {
     navigator.clipboard.writeText(content);
-    toast.success("已复制到剪贴板", {
-      description: "内容已成功复制到您的剪贴板",
+    toast.success("Copied to clipboard", {
+      description: "Content has been successfully copied to your clipboard",
       duration: 2000,
     });
   };
@@ -46,16 +46,16 @@ export function CompactMode({
 
   return (
     <div className="compact-window">
-      {/* 小窗口顶部栏 */}
+      {/* small screen header */}
       <div className="compact-header">
         <div className="flex items-center space-x-2">
           <span className="text-xl">📋</span>
-          <h3 className="text-sm font-medium">快速访问</h3>
+          <h3 className="text-sm font-medium">Quick Access</h3>
         </div>
         <div className="flex items-center space-x-2">
           <Input
             type="text"
-            placeholder="搜索剪贴板内容..."
+            placeholder="Search clipboard content..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
             className="compact-search"
@@ -75,7 +75,7 @@ export function CompactMode({
         </div>
       </div>
 
-      {/* 快速过滤标签 */}
+      {/* quick filter tabs */}
       <div className="compact-tabs">
         <Tabs
           defaultValue="All"
@@ -85,17 +85,27 @@ export function CompactMode({
           }
         >
           <TabsList className="grid grid-cols-4 w-full">
-            <TabsTrigger value="All">全部</TabsTrigger>
-            <TabsTrigger value="Text">文本</TabsTrigger>
-            <TabsTrigger value="Url">链接</TabsTrigger>
-            <TabsTrigger value="Code">代码</TabsTrigger>
+            <TabsTrigger value="All">All</TabsTrigger>
+            <TabsTrigger value="Text">Text</TabsTrigger>
+            <TabsTrigger value="Url">Link</TabsTrigger>
+            <TabsTrigger value="Code">Code</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
 
-      {/* 剪贴板列表区域 */}
-      <ScrollArea className="compact-list">
-        <div className="space-y-2 p-2">
+      {/* clipboard list area */}
+      <ScrollArea
+        className="compact-list"
+        style={{ height: "calc(100% - 140px)" }}
+      >
+        <div
+          className="space-y-2 p-2"
+          style={{
+            minHeight: "100%",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           {filteredHistory.length > 0 ? (
             filteredHistory.map((item, index) => (
               <Card
@@ -108,6 +118,18 @@ export function CompactMode({
                   copyToClipboard(item.content);
                   onHide();
                 }}
+                ref={
+                  index === focusedItemIndex
+                    ? (el) => {
+                        if (el) {
+                          el.scrollIntoView({
+                            block: "nearest",
+                            behavior: "auto",
+                          });
+                        }
+                      }
+                    : null
+                }
               >
                 <CardContent className="p-3">
                   <div className="flex items-center justify-between">
@@ -130,7 +152,7 @@ export function CompactMode({
                         copyToClipboard(item.content);
                       }}
                     >
-                      复制
+                      Copy
                     </Button>
                   </div>
                 </CardContent>
@@ -140,19 +162,19 @@ export function CompactMode({
             <div className="flex flex-col items-center justify-center py-8">
               <span className="text-2xl mb-2">🔍</span>
               <p className="text-sm text-muted-foreground">
-                未找到匹配的剪贴板记录
+                No matching clipboard records found
               </p>
             </div>
           )}
         </div>
       </ScrollArea>
 
-      {/* 键盘快捷键提示 */}
+      {/* keyboard shortcut tips */}
       <div className="compact-footer">
         <div className="flex justify-center space-x-4 text-xs text-muted-foreground">
-          <span>↑↓ 选择</span>
-          <span>Enter 复制并关闭</span>
-          <span>Esc 关闭</span>
+          <span>↑↓ Select</span>
+          <span>Enter to copy and close</span>
+          <span>Esc to close</span>
         </div>
       </div>
     </div>
