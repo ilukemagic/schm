@@ -24,4 +24,8 @@ dist-ssr
 *.sw?
 
 clipboard_history.db
-.vite/*
+
+# Vite
+.vite
+.vite/
+**/.vite/**
